@@ -43,7 +43,7 @@ while True:
 
         for vm in container.view:
             if search == "" or search.lower() in vm.name.lower():
-                print(f"\nVM Name: {vm._name}")
+                print(f"\nVM Name: {vm.name}")
                 print(f"Power State: {vm.runtime.powerState}")
                 print(f"CPUs: {vm.config.hardware.numCPU}")
                 print(f"Memory: {vm.config.hardware.memoryMB / 1024} GB")
