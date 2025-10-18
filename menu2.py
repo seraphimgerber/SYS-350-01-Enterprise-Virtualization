@@ -58,7 +58,12 @@ while True:
             print(f"{vm.name} done")
 
     elif choice == "3":
-
+        search = input("VM name: ")
+        vms = get_vms(search)
+        snap_name = input("Snapshot name: ")
+        for vm in vms:
+            vm.CreateSnapshot(snap_name, "", False, False)
+            print(f"Snapshot created for {vm.name}")
 
     elif choice == "4":
 
@@ -74,3 +79,8 @@ while True:
 
     else:
         print("Invalid option, please enter 1-4.")
+
+
+# creds 
+# create snapshot - https://github.com/reubenur-rahman/vmware-pyvmomi-examples/blob/master/create_and_remove_snapshot.py
+
