@@ -28,10 +28,10 @@ menu = {}
 menu['1'] = "List VMs"
 menu['2'] = "Power On/Off"
 menu['3'] = "Snapshot"
-menu['4'] = "Full Clone"
-menu['5'] = "Linked Clone"
-menu['6'] = "Delete VM"
-menu['7'] = "Create from Template"
+menu['4'] = "Delete Snapshot"
+menu['5'] = "Full Clone"
+menu['6'] = "Linked Clone"
+menu['7'] = "Delete VM"
 menu['8'] = "Exit"
 while True:
     print("\n")
@@ -64,8 +64,23 @@ while True:
         for vm in vms:
             vm.CreateSnapshot(snap_name, "", False, False)
             print(f"Snapshot created for {vm.name}")
-    # full clone
+    # delete snapshot
     elif choice == "4":
+        vm_name = input("VM name: ")
+        snap_name = input("Snapshot name: ")
+        vms = get_vms(vm_name)
+        if vms:
+            vm = vms[0]
+            if vm.snapshot:
+                for snap in vm.snapshot.rootSnapshotList:
+                    if snap.name == snap_name:
+                        snap.snapshot.RemoveSnapshot_Task(False)
+                        print(f"Deleted snapshot {snap_name}")
+                        break
+            else:
+                print("No snapshots")
+    # full clone
+    elif choice == "5":
         vm_name = input("VM to clone: ")
         clone_name = input("Clone name: ")
         vms = get_vms(vm_name)
@@ -78,7 +93,7 @@ while True:
             vm.Clone(folder=vm.parent, name=clone_name, spec=clonespec)
             print("Creating full clone...")
     # linked clone
-    elif choice == "5":
+    elif choice == "6":
         vm_name = input("VM to clone: ")
         clone_name = input("Clone name: ")
         vms = get_vms(vm_name)
@@ -97,38 +112,23 @@ while True:
             vm.Clone(folder=vm.parent, name=clone_name, spec=clonespec)
             print("Creating linked clone...")
     # delete VMs
-    elif choice == "6":
+    elif choice == "7":
         search = input("VM name: ")
         vms = get_vms(search)
         for vm in vms:
             if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
                 vm.PowerOff()
             vm.Destroy()
-    # create from template
-    elif choice == "7":
-        container = si.content.viewManager.CreateContainerView(si.content.rootFolder, [vim.VirtualMachine], True)
-        templates = [vm for vm in container.view if vm.config.template]
-        for i, t in enumerate(templates):
-            print(f"{i+1}. {t.name}")
-        tmpl_choice = int(input("Select template: ")) - 1
-        vm_name = input("New VM name: ")
-        template = templates[tmpl_choice]
-        clonespec = vim.vm.CloneSpec()
-        clonespec.location = vim.vm.RelocateSpec()
-        clonespec.powerOn = False
-        clonespec.template = False
-        template.Clone(folder=template.parent, name=vm_name, spec=clonespec)
-    # exit
     elif choice == "8":
         Disconnect(si)
         break
 
     else:
-        print("Invalid option, please enter 1-4.")
+        print("Invalid option, please enter 1-8.")
 
 
 # creds 
 # create snapshot - https://github.com/reubenur-rahman/vmware-pyvmomi-examples/blob/master/create_and_remove_snapshot.py
-# full clone, linked clone, and template clone - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/clone_vm.py
+# full clone and linked clone - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/clone_vm.py
 # delete - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/destroy_vm.py
 # troubleshooting - claude.ai
