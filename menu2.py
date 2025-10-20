@@ -39,13 +39,13 @@ while True:
         print(f"{key}. {menu[key]}")
 
     choice = input("Choice: ")
-
+    # list vms
     if choice == "1":
         search = input("VM name: ")
         vms = get_vms(search)
         for vm in vms:
             print(f"{vm.name} - {vm.runtime.powerState}")
-
+    # power on/off
     elif choice == "2":
         search = input("VM name: ")
         vms = get_vms(search)
@@ -56,7 +56,7 @@ while True:
             else:
                 vm.PowerOff()
             print(f"{vm.name} done")
-
+    # snapshot
     elif choice == "3":
         search = input("VM name: ")
         vms = get_vms(search)
@@ -64,15 +64,46 @@ while True:
         for vm in vms:
             vm.CreateSnapshot(snap_name, "", False, False)
             print(f"Snapshot created for {vm.name}")
-
+    # full clone
     elif choice == "4":
-
+        vm_name = input("VM to clone: ")
+        clone_name = input("Clone name: ")
+        vms = get_vms(vm_name)
+        if vms:
+            vm = vms[0]
+            clonespec = vim.vm.CloneSpec()
+            clonespec.location = vim.vm.RelocateSpec()
+            clonespec.powerOn = False
+            clonespec.template = False
+            vm.Clone(folder=vm.parent, name=clone_name, spec=clonespec)
+            print("Creating full clone...")
+    # linked clone
     elif choice == "5":
-
+        vm_name = input("VM to clone: ")
+        clone_name = input("Clone name: ")
+        vms = get_vms(vm_name)
+        if vms:
+            vm = vms[0]
+            if not vm.snapshot:
+                vm.CreateSnapshot("temp", "", False, False)
+                time.sleep(2)
+            
+            clonespec = vim.vm.CloneSpec()
+            clonespec.location = vim.vm.RelocateSpec()
+            clonespec.location.diskMoveType = 'createNewChildDiskBacking'
+            clonespec.powerOn = False
+            clonespec.template = False
+            clonespec.snapshot = vm.snapshot.currentSnapshot
+            vm.Clone(folder=vm.parent, name=clone_name, spec=clonespec)
+            print("Creating linked clone...")
+        
+    # delete VMs
     elif choice == "6":
-
+        
+    # create from template
     elif choice == "7":
-       
+        
+    # exit
     elif choice == "8":
         Disconnect(si)
         break
@@ -83,4 +114,5 @@ while True:
 
 # creds 
 # create snapshot - https://github.com/reubenur-rahman/vmware-pyvmomi-examples/blob/master/create_and_remove_snapshot.py
+# full and linked clone - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/clone_vm.py
 
