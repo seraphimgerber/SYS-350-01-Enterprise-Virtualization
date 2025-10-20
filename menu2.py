@@ -96,13 +96,28 @@ while True:
             clonespec.snapshot = vm.snapshot.currentSnapshot
             vm.Clone(folder=vm.parent, name=clone_name, spec=clonespec)
             print("Creating linked clone...")
-        
     # delete VMs
     elif choice == "6":
-        
+        search = input("VM name: ")
+        vms = get_vms(search)
+        for vm in vms:
+            if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
+                vm.PowerOff()
+            vm.Destroy()
     # create from template
     elif choice == "7":
-        
+        container = si.content.viewManager.CreateContainerView(si.content.rootFolder, [vim.VirtualMachine], True)
+        templates = [vm for vm in container.view if vm.config.template]
+        for i, t in enumerate(templates):
+            print(f"{i+1}. {t.name}")
+        tmpl_choice = int(input("Select template: ")) - 1
+        vm_name = input("New VM name: ")
+        template = templates[tmpl_choice]
+        clonespec = vim.vm.CloneSpec()
+        clonespec.location = vim.vm.RelocateSpec()
+        clonespec.powerOn = False
+        clonespec.template = False
+        template.Clone(folder=template.parent, name=vm_name, spec=clonespec)
     # exit
     elif choice == "8":
         Disconnect(si)
@@ -114,5 +129,6 @@ while True:
 
 # creds 
 # create snapshot - https://github.com/reubenur-rahman/vmware-pyvmomi-examples/blob/master/create_and_remove_snapshot.py
-# full and linked clone - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/clone_vm.py
-
+# full clone, linked clone, and template clone - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/clone_vm.py
+# delete - https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/destroy_vm.py
+# troubleshooting - claude.ai
