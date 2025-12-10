@@ -60,3 +60,7 @@ Upon completion of the course, students will be able to:
 ### Module 8
 
 [Milestone 8 - Openstack Deploy](https://github.com/seraphimgerber/SYS-350-01-Enterprise-Virtualization/wiki/Milestone-8-%E2%80%90-OpenStack-Deploy)
+
+### Module 9 
+
+[Milestone 9 - Server Decommission](https://github.com/seraphimgerber/SYS-350-01-Enterprise-Virtualization/wiki/Milestone-9-%E2%80%90-Server-Decommission)
